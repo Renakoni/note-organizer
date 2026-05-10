@@ -2,6 +2,8 @@
 
 _把课程资料、讲义、题库和个人笔记整理成可复习、可追踪、可继续维护的 Markdown 笔记库。_
 
+English version: [README.en.md](README.en.md)
+
 ---
 
 ## 安装
@@ -51,7 +53,7 @@ git clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer
 把本仓库放入 Claude 的 skills 目录：
 
 ```bash
-git clone <this-repo-url> ~/.claude/skills/note-organizer
+git clone https://github.com/Renakoni/note-organizer.git ~/.claude/skills/note-organizer
 ```
 
 也可以手动复制目录，最终结构应类似：
@@ -184,7 +186,7 @@ Skill 会在第一轮扫描里提取已有题目，包括课后习题、复习�
 
 ## 许可证与依赖说明
 
-本项目使用 MIT License，详见 `LICENSE`。
+本项目使用 MIT License，详见 [LICENSE](LICENSE)。
 
 本 skill 不复制、修改或再分发 `pdf`、`docx`、`pptx` 等文档处理 skills。请按这些 skills 各自的来源和许可单独安装。
 
