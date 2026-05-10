@@ -1,6 +1,6 @@
 # Note Organizer
 
-_Turn course materials, lecture slides, question banks, and personal notes into a reviewable, traceable, maintainable Markdown note library._
+_Exam in three days, and your materials are scattered across slides, PDFs, notes, and question banks? This skill helps Claude turn the mess into a Markdown note folder you can actually study from._
 
 ---
 
@@ -38,7 +38,17 @@ git clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer
 
 `markdown-mermaid-writing` helps with Markdown structure, relationship maps, and document organization. Note Organizer does not require README files or notes to use Mermaid, but this skill is useful for complex knowledge maps.
 
-Source repository: <https://github.com/SuperiorByteWorks-LLC/agent-project>
+Source repository: <https://github.com/K-Dense-AI/scientific-agent-skills>
+
+If you only want this skill, use sparse checkout:
+
+```bash
+git clone --filter=blob:none --sparse https://github.com/K-Dense-AI/scientific-agent-skills.git /tmp/scientific-agent-skills
+cd /tmp/scientific-agent-skills
+git sparse-checkout set markdown-mermaid-writing
+mkdir -p ~/.claude/skills
+cp -R markdown-mermaid-writing ~/.claude/skills/markdown-mermaid-writing
+```
 
 If you already have the `markdown-mermaid-writing` skill, place it in Claude's skills directory:
 
@@ -69,27 +79,31 @@ After installation, restart Claude Code or start a new session.
 
 ## Quick start
 
-Put your materials in one folder, then ask Claude:
+Put your materials in one folder, then call the skill explicitly:
 
 ```text
+/note-organizer
 The materials are in ./material. Please organize them into a review note library.
 ```
 
 You can also be more specific:
 
 ```text
+/note-organizer
 This folder contains teacher PPTs, textbook excerpts, my class notes, and several past exam papers. Please organize them into a Markdown note library, and keep source questions separate from generated questions.
 ```
+
+You can also omit the slash command and simply ask Claude to organize notes or review materials. Claude should call this skill when the task fits.
 
 Claude will first scan the materials, identify existing questions, infer chapters and source roles, then ask for one structure confirmation. After that, it will continue in batches.
 
 ## What this skill does
 
-Note Organizer is a Claude Skill for organizing scattered study materials. It works well with teacher slides, textbook excerpts, PDFs, Word documents, PowerPoint files, personal notes, senior-student notes, homework questions, past exams, and question banks.
+Note Organizer is a Claude Skill for the moment when you technically have all the materials, but no clear place to start. It works with teacher slides, textbook excerpts, PDFs, Word documents, PowerPoint files, personal notes, senior-student notes, homework questions, past exams, and question banks.
 
-It does not compress everything into one long summary. It builds a reusable note workflow: source inventory, chapter inference, existing-question extraction, local indexing, chapter notes, coverage checks, gap tracking, and practice questions.
+It does not squeeze everything into one long summary. It first sorts out the sources, infers the chapter structure, extracts existing questions, builds a local index, and then writes chapter-based Markdown notes you can keep editing.
 
-The output is plain Markdown. You can use it in Obsidian, VS Code, GitHub, or any Markdown editor. Obsidian users can also use the generated `[[wikilinks]]` directly.
+Obsidian is the recommended way to open the generated folder. The notes are plain Markdown and include `[[wikilinks]]`, so you can keep reviewing, editing, and jumping between related ideas in Obsidian. VS Code, GitHub, and other Markdown tools work too.
 
 ## Recommended workflow
 

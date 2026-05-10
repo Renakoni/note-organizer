@@ -1,6 +1,6 @@
 # 笔记整理
 
-_把课程资料、讲义、题库和个人笔记整理成可复习、可追踪、可继续维护的 Markdown 笔记库。_
+_还有 3 天考试，资料散在课件、PDF、笔记和题库里？这个 skill 会先帮你理清资料，再整理成一套能直接打开复习的 Markdown 笔记。_
 
 English version: [README.en.md](README.en.md)
 
@@ -40,7 +40,17 @@ git clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer
 
 `markdown-mermaid-writing` 用于 Markdown 结构、关系图和文档组织。笔记整理不要求 README 或笔记一定使用 Mermaid，但这个 skill 对复杂知识关系图有帮助。
 
-来源仓库：<https://github.com/SuperiorByteWorks-LLC/agent-project>
+来源仓库：<https://github.com/K-Dense-AI/scientific-agent-skills>
+
+如果只想安装这个 skill，可以用 sparse checkout：
+
+```bash
+git clone --filter=blob:none --sparse https://github.com/K-Dense-AI/scientific-agent-skills.git /tmp/scientific-agent-skills
+cd /tmp/scientific-agent-skills
+git sparse-checkout set markdown-mermaid-writing
+mkdir -p ~/.claude/skills
+cp -R markdown-mermaid-writing ~/.claude/skills/markdown-mermaid-writing
+```
 
 如果你已经有 `markdown-mermaid-writing` skill，把它放在 Claude 的 skills 目录即可：
 
@@ -70,27 +80,31 @@ git clone https://github.com/Renakoni/note-organizer.git ~/.claude/skills/note-o
 
 ## 快速使用
 
-把资料放进一个文件夹，然后直接告诉 Claude：
+把资料放进一个文件夹，然后显式调用 skill：
 
 ```text
+/note-organizer
 资料都在 ./material，帮我整理成一套复习笔记。
 ```
 
 也可以说得更具体：
 
 ```text
+/note-organizer
 这个文件夹里有老师 PPT、教材摘录、我的课堂笔记和几份历年题。请整理成 Markdown 笔记库，题目和自建题要分开。
 ```
+
+也可以不写 slash command，直接说“帮我整理笔记”或“帮我整理复习资料”。Claude 会在合适时自动调用这个 skill。
 
 Claude 会先扫描资料、识别已有题目、推断章节和资料角色，然后给出一次结构确认。确认后，它会继续分批生成笔记。
 
 ## 项目简介
 
-笔记整理是一个 Claude Skill，用来处理零散的学习资料。它适合整理老师课件、教材摘录、PDF、Word 文档、PPT、个人课堂笔记、学长学姐资料、课后习题、历年试题和题库。
+笔记整理是一个 Claude Skill，用来处理那种“资料都有，但不知道从哪里开始看”的学习场景。老师课件、教材摘录、PDF、Word 文档、PPT、个人课堂笔记、学长学姐资料、课后习题、历年试题和题库，都可以一起交给它整理。
 
-它不是把所有资料压成一篇长总结。它更像一个整理流程：先梳理资料来源，再推断章节结构，提取已有题目，建立索引，然后按章节生成可继续维护的 Markdown 笔记。
+它不会把所有资料压成一篇长总结。它会先梳理资料来源，再推断章节结构，提取已有题目，建立索引，然后按章节生成可以继续维护的 Markdown 笔记。
 
-输出文件可以放进 Obsidian、VS Code、GitHub 或其他 Markdown 工具里使用。Obsidian 用户也可以直接使用生成的 `[[双链]]`。
+推荐用 Obsidian 打开整理后的文件夹。生成的笔记是普通 Markdown 文件，里面会带有 `[[双链]]`，适合在 Obsidian 里继续复习、补充和跳转。你也可以用 VS Code、GitHub 或其他 Markdown 工具查看。
 
 ## 推荐工作流
 
