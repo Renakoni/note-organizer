@@ -1,6 +1,6 @@
 # 笔记整理
 
-_还有 3 天考试，资料散在课件、PDF、笔记和题库里？这个 skill 会先帮你理清资料，再整理成一套能直接打开复习的 Markdown 笔记。_
+_三天后考试，课件还没看，PDF 还没翻，笔记散得像案发现场？把资料文件夹交给它，它会先理清章节、题目和重点，再整理成一套能直接打开复习的 Markdown 笔记。_
 
 English version: [README.en.md](README.en.md)
 
@@ -8,11 +8,11 @@ English version: [README.en.md](README.en.md)
 
 ## 安装
 
-先安装前置 skills，再安装本 skill。
+安装前置 skills，然后安装本 skill。
 
 ### 1. 安装 Claude 官方文档 skills
 
-笔记整理需要读取 PDF、Word 和 PowerPoint 资料。建议先安装 Anthropic 官方 `document-skills`，其中包含 `pdf`、`docx`、`pptx` 和 `xlsx`。[^1]
+笔记整理需要读取 PDF、Word 和 PowerPoint 资料。先安装 Anthropic 官方 `document-skills`，其中包含 `pdf`、`docx`、`pptx` 和 `xlsx`。[^1]
 
 在 Claude Code 中先添加官方 skills marketplace：
 
@@ -26,39 +26,27 @@ English version: [README.en.md](README.en.md)
 /plugin install document-skills@anthropic-agent-skills
 ```
 
-### 2. 安装 humanizer
+### 2. 安装推荐辅助 skills
 
-`humanizer` 用于在内容正确后做文字润色，让最终笔记读起来更自然。它不是必须项，但推荐安装。
+完整体验需要 `humanizer` 和 `markdown-mermaid-writing`：
 
-仓库：<https://github.com/blader/humanizer>
+- `humanizer`：用于在内容正确后做文字润色，让最终笔记读起来更自然。
+- `markdown-mermaid-writing`：用于知识关系图、章节结构图和复习路线图。没有它也能整理笔记，但完整形态需要它。
 
-```bash
-git clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer
-```
-
-### 3. 安装 markdown-mermaid-writing
-
-`markdown-mermaid-writing` 用于 Markdown 结构、关系图和文档组织。笔记整理不要求 README 或笔记一定使用 Mermaid，但这个 skill 对复杂知识关系图有帮助。
-
-来源仓库：<https://github.com/K-Dense-AI/scientific-agent-skills>
-
-如果只想安装这个 skill，可以用 sparse checkout：
+本仓库提供了安装脚本：
 
 ```bash
-git clone --filter=blob:none --sparse https://github.com/K-Dense-AI/scientific-agent-skills.git /tmp/scientific-agent-skills
-cd /tmp/scientific-agent-skills
-git sparse-checkout set markdown-mermaid-writing
-mkdir -p ~/.claude/skills
-cp -R markdown-mermaid-writing ~/.claude/skills/markdown-mermaid-writing
+bash tools/install-recommended-skills.sh
 ```
 
-如果你已经有 `markdown-mermaid-writing` skill，把它放在 Claude 的 skills 目录即可：
+脚本会安装：
 
-```text
-~/.claude/skills/markdown-mermaid-writing/
-```
+- `humanizer`：<https://github.com/blader/humanizer>
+- `markdown-mermaid-writing`：来自 <https://github.com/K-Dense-AI/scientific-agent-skills>
 
-### 4. 安装笔记整理
+如需手动安装，可参考脚本内容。
+
+### 3. 安装笔记整理
 
 把本仓库放入 Claude 的 skills 目录：
 

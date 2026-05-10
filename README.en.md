@@ -1,6 +1,6 @@
 # Note Organizer
 
-_Exam in three days, and your materials are scattered across slides, PDFs, notes, and question banks? This skill helps Claude turn the mess into a Markdown note folder you can actually study from._
+_Exam in three days, slides unread, PDFs untouched, notes scattered like a crime scene? Give it the materials folder. It will sort the chapters, questions, and priorities, then turn the mess into a Markdown note library you can actually study from._
 
 ---
 
@@ -10,7 +10,7 @@ Install the prerequisite skills first, then install this skill.
 
 ### 1. Install Claude official document skills
 
-Note Organizer needs document skills to read PDF, Word, and PowerPoint materials. Install Anthropic's official `document-skills`, which includes `pdf`, `docx`, `pptx`, and `xlsx`.[^1]
+Note Organizer reads PDF, Word, and PowerPoint materials through Anthropic's official `document-skills`, which includes `pdf`, `docx`, `pptx`, and `xlsx`.[^1]
 
 In Claude Code, add the official skills marketplace first:
 
@@ -24,39 +24,27 @@ Then install the document skills:
 /plugin install document-skills@anthropic-agent-skills
 ```
 
-### 2. Install humanizer
+### 2. Install recommended helper skills
 
-`humanizer` is used for final prose polishing after the content is already correct. It is optional, but recommended.
+For the full experience, install `humanizer` and `markdown-mermaid-writing`:
 
-Repository: <https://github.com/blader/humanizer>
+- `humanizer`: polishes the final prose after the content is correct.
+- `markdown-mermaid-writing`: helps with knowledge maps, chapter structure diagrams, and review routes. Note Organizer still works without it, but the complete experience uses it.
 
-```bash
-git clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer
-```
-
-### 3. Install markdown-mermaid-writing
-
-`markdown-mermaid-writing` helps with Markdown structure, relationship maps, and document organization. Note Organizer does not require README files or notes to use Mermaid, but this skill is useful for complex knowledge maps.
-
-Source repository: <https://github.com/K-Dense-AI/scientific-agent-skills>
-
-If you only want this skill, use sparse checkout:
+This repository includes a helper script:
 
 ```bash
-git clone --filter=blob:none --sparse https://github.com/K-Dense-AI/scientific-agent-skills.git /tmp/scientific-agent-skills
-cd /tmp/scientific-agent-skills
-git sparse-checkout set markdown-mermaid-writing
-mkdir -p ~/.claude/skills
-cp -R markdown-mermaid-writing ~/.claude/skills/markdown-mermaid-writing
+bash tools/install-recommended-skills.sh
 ```
 
-If you already have the `markdown-mermaid-writing` skill, place it in Claude's skills directory:
+The script installs:
 
-```text
-~/.claude/skills/markdown-mermaid-writing/
-```
+- `humanizer`: <https://github.com/blader/humanizer>
+- `markdown-mermaid-writing`: from <https://github.com/K-Dense-AI/scientific-agent-skills>
 
-### 4. Install Note Organizer
+For manual installation, read the script.
+
+### 3. Install Note Organizer
 
 Clone this repository into Claude's skills directory:
 
