@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+skill_dir="$(cd "$script_dir/.." && pwd)"
+
+python_cmd="${PYTHON:-python3}"
+if ! command -v "$python_cmd" >/dev/null 2>&1; then
+  python_cmd="python"
+fi
+if ! command -v "$python_cmd" >/dev/null 2>&1; then
+  echo "Python not found. Install Python first." >&2
+  exit 1
+fi
+if ! command -v git >/dev/null 2>&1; then
+  echo "Git not found. Install Git first." >&2
+  exit 1
+fi
+
+"$python_cmd" -m pip install -r "$skill_dir/requirements.txt"
+
 skills_dir="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
 mkdir -p "$skills_dir"
 
@@ -31,16 +49,19 @@ install_markdown_mermaid_writing() {
 
   local tmp_dir
   tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"' EXIT
 
   echo "Installing markdown-mermaid-writing..."
   git clone --filter=blob:none --sparse https://github.com/K-Dense-AI/scientific-agent-skills.git "$tmp_dir/scientific-agent-skills"
   git -C "$tmp_dir/scientific-agent-skills" sparse-checkout set scientific-skills/markdown-mermaid-writing
   cp -R "$tmp_dir/scientific-agent-skills/scientific-skills/markdown-mermaid-writing" "$target"
   rm -rf "$tmp_dir"
+  trap - EXIT
 }
 
 install_or_update_repo "humanizer" "https://github.com/blader/humanizer.git"
 install_markdown_mermaid_writing
 
-echo "Recommended skills installed in: $skills_dir"
+echo "Environment installed."
+echo "Additional skills installed in: $skills_dir"
 echo "Restart Claude Code or open a new session before using them."

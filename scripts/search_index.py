@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse, json, re
 from pathlib import Path
+from source_roles import AUTHORITY_SOURCE_ROLES, role_in
 
 
 def read_jsonl(path: Path):
@@ -24,7 +25,7 @@ def score(row, pattern, regex=False, chapter=''):
     boost = 0
     if pattern.lower() in heading.lower():
         boost += 5
-    if row.get('source_role') in {'teacher/textbook', 'user_notes'}:
+    if role_in(row.get('source_role'), AUTHORITY_SOURCE_ROLES):
         boost += 2
     if chapter and chapter.lower() in (row.get('inferred_chapter') or '').lower():
         boost += 3

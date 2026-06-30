@@ -2,9 +2,10 @@
 import argparse, json, re
 from pathlib import Path
 from collections import Counter
+from source_roles import AUTHORITY_SOURCE_ROLES, role_in, role_rank
 
-TERM_RE = re.compile(r'[A-Za-z][A-Za-z0-9_/-]{2,}|[一-鿿]{2,12}')
-STOP_TERMS = {'老师', '重点', '注意', '已有答案', '章节', '资料', '复习', '检查', '本章', '全书', '内容', '问题', '答案', '解析', '定义', '概念', '方法', '过程', '特点', '作用', '意义', '原因', '影响', '应用', '类型', '分类', '原则', 'the', 'and', 'for', 'with', 'this', 'that', 'chapter', 'page', 'slide'}
+TERM_RE = re.compile(r'[A-Za-z][A-Za-z0-9_/-]{1,}(?:模型|技术|方法|系统|算法|平台|流程|标准|协议|函数|定理|理论|结构|机制|规则|公式|概念|指标|工具|框架)|[A-Za-z][A-Za-z0-9_/-]{2,}|[一-鿿]{2,12}')
+STOP_TERMS = {'老师', '重点', '注意', '已有答案', '章节', '资料', '复习', '检查', '本章', '全书', '内容', '问题', '答案', '解析', '定义', '概念', '方法', '过程', '特点', '作用', '意义', '原因', '影响', '应用', '类型', '分类', '原则', '什么是', 'the', 'and', 'for', 'with', 'this', 'that', 'chapter', 'page', 'slide'}
 
 
 def read_jsonl(path: Path):
@@ -46,7 +47,7 @@ def extract_terms(rows, limit=24):
             term = normalize_term(raw)
             if keep_term(term):
                 counts[term] += 1
-                if r.get('source_role') in {'teacher/textbook', 'user_notes'}:
+                if role_in(r.get('source_role'), AUTHORITY_SOURCE_ROLES):
                     role_bonus[term] += 2
     ranked = sorted(counts, key=lambda t: (-(counts[t] + role_bonus[t]), -len(t), t))
     return ranked[:limit]
@@ -80,8 +81,7 @@ def main():
         q = re.sub(r'第|章|chapter|ch\.?', '', args.chapter, flags=re.I).strip()
         matched = [r for r in chunks if q and q.lower() in r.get('text', '').lower()]
 
-    role_order = {'teacher/textbook': 0, 'user_notes': 1, 'historical_questions': 2, 'senior_notes': 3, 'other': 4}
-    matched.sort(key=lambda r: (role_order.get(r.get('source_role'), 9), r.get('file') or '', r.get('chunk_id') or ''))
+    matched.sort(key=lambda r: (role_rank(r.get('source_role')), r.get('file') or '', r.get('chunk_id') or ''))
     matched = matched[:args.limit]
 
     chapter_terms = extract_terms(matched)

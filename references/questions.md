@@ -44,20 +44,29 @@ First classify:
 Then handle by answer state:
 
 - Questions without answers: write answer + analysis + source + coverage status.
-- Questions with answers but no analysis: preserve original answer, add analysis, verify against teacher/textbook sources, and mark doubts.
+- Questions with answers but no analysis: preserve original answer, add analysis, verify against `teacher_ppt`, `textbook`, `official_handout`, `syllabus`, or `user_note` sources, and mark doubts.
 - Questions with answers and analysis: organize, verify, source, extract question style, and check whether notes cover them.
+
+Preserve original source answers. If a source answer is corrected, expanded, or reframed, separate the original answer from the organized answer and explain the basis. If a source answer conflicts with teacher PPT, textbook, official handout, syllabus, or user-note material, mark `来源冲突` and authority level rather than silently rewriting it.
 
 Per-question format:
 
 ```markdown
 ### [来源/年份]-[题型]-[编号] 题目
 
-## 答案
+## 题目
+## 原始答案
+## 整理后答案
 ## 解析
 ## 出处
+## 依据级别
+## 证据状态
 ## 当前笔记覆盖情况
 ## 是否需要补强
+## 冲突/待核验
 ```
+
+Use `原始答案` only when a source answer exists. Use `整理后答案` for the verified, study-ready answer. Keep corrections, assumptions, and uncertainty out of the original-answer section.
 
 ## Coverage classification
 
@@ -70,16 +79,28 @@ Use questions as a coverage audit, not only as practice.
 | C：依赖外部补充，且已标记 | Answer uses external supplements already marked in notes/index. | Ensure the external source is marked and local-source authority is clear. |
 | D：疑似先验/推断，需要加深 | Answer relies on inference or prior knowledge not clearly supported by current materials. | Resolve from local sources or log in `00_资料缺口与待确认.md`. |
 
+Pair every A-D label with a provenance/support status when practical:
+
+| Support status | Meaning |
+|---|---|
+| `directly_supported` / `明确依据` | A local source directly supports the answer or note claim. |
+| `partially_supported` / `间接支持` | Local sources support the direction but not the full answer. |
+| `contradicted` / `来源冲突` | Source answer, note, or material conflicts with another source. |
+| `external_only` / `外部补充` | The answer depends on marked external material. |
+| `inferred_pending_verification` / `待核验` | The answer still relies on inference and must not be presented as certain. |
+
 Create or update `00_题目覆盖与笔记补强.md`:
 
 ```markdown
 # 题目覆盖与笔记补强
 
-| 题目 | 覆盖类型 | 暴露问题 | 已补强到 | 仍需确认 |
-|---|---|---|---|---|
+| 题目 | 覆盖类型 | 证据状态 | 暴露问题 | 已补强到 | 仍需确认 |
+|---|---|---|---|---|---|
 ```
 
-For B-D items, apply strengthening when the source support is clear. If not clear, do not invent; log the gap and what should be checked.
+When a draft note, source-question analysis, or generated practice file exists, use `scripts/coverage_check.py` against `.course_index/` as a conservative first pass, then review the result before writing B-D strengthening items.
+
+For B-D items, apply strengthening when the source support is clear. If not clear, do not invent; log the gap and what should be checked. D items cannot be resolved by confident model inference alone: resolve from local sources, mark as `外部补充`, or keep as `待核验`.
 
 ## No-question fallback
 
@@ -132,17 +153,25 @@ Each question should include:
 | 考点 | ... |
 | 答案 | ... |
 | 解析 | ... |
-| 出处 | teacher/textbook/user note/existing note/external supplement |
+| 出处 | `teacher_ppt` / `textbook` / `official_handout` / `syllabus` / `user_note` / `existing_vault` / `external_supplement` plus concrete source location when available |
+| 依据级别 | 本地权威资料 / 课堂/用户笔记 / 来源题/历史题 / 既有笔记 / 外部补充 / 模型推断/待核验 |
+| 证据状态 | 明确依据 / 间接支持 / 来源冲突 / 提取存疑 / 待核验 / 外部补充 |
 
 Generated questions should cover both historical/source-question topics and important material that has not appeared in available questions. Every generated question must be directly answerable from course knowledge.
+
+Generated practice must not retroactively create unsupported course facts. If an answer cannot be traced to local course content, marked external supplement, or explicit `待核验`, do not present it as certain.
 
 ## Final quality pass
 
 | Check | Pass condition |
 |---|---|
 | Existing questions first | Source questions were indexed before generated practice. |
+| Original answers preserved | Source-provided answers remain separate from organized/corrected answers. |
 | Course-content question | The question tests a definition, concept, formula, model, comparison, process, timeline, theory, rule, case, application, applied reasoning, or judgment from the course. |
 | Answerable | A student can write a direct answer without guessing the examiner's intent. |
-| Source-backed | The answer can be linked to teacher/textbook, user notes, existing notes, or marked external supplement. |
+| Source-backed | The answer can be linked to teacher PPT, textbook, official handout, syllabus, user notes, existing notes, or marked external supplement. |
+| Provenance present | Answer/source fields include source role, source location when available, and evidence status. |
+| Uncertainty preserved | Conflicts, extraction doubts, and unsupported inferences are marked rather than hidden. |
+| External clearly marked | External supplements are labeled and subordinate to local materials. |
 | Not meta | It is not about study strategy, chapter importance, or “how would you answer if asked”. |
 | Coverage updated | B-D items are reflected in strengthened notes, `00_题目覆盖与笔记补强.md`, or gap files. |

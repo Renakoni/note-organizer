@@ -2,19 +2,20 @@
 import argparse, json, re
 from pathlib import Path
 from collections import Counter
+from source_roles import QUESTION_SOURCE_ROLES, normalize_role_counts
 
 STOP_TERMS = {
     '老师', '重点', '注意', '已有答案', '章节', '资料', '复习', '检查', '本章', '全书', '内容', '问题', '答案', '解析',
     '定义', '概念', '方法', '过程', '特点', '作用', '意义', '原因', '影响', '应用', '类型', '分类', '原则',
-    '第一章', '第二章', '第三章', '第四章', '第五章', '第六章'
+    '第一章', '第二章', '第三章', '第四章', '第五章', '第六章', '什么是'
 }
 SECTION_LABELS = {
     '概述', '背景', '定义', '原理', '方法', '过程', '步骤', '分类', '特点', '作用', '意义', '应用', '案例',
     '表现', '检查', '诊断', '治疗', '处理', '评价', '结果', '讨论', '总结', '练习', '思考题',
-    '临床表现', '辅助检查', '治疗原则'
+    '复习题', '自测', '课堂笔记', '临床表现', '辅助检查', '治疗原则'
 }
 GENERIC_PREFIX_RE = re.compile(r'^(不要|主要|包括|进行|判断|比较|简述|说明|如何|为什么|哪些|一种以|通常|相关|有关|仍|与|的|本|该|其|由|将|可|应|要)')
-BAD_PHRASE_RE = re.compile(r'(包括|原则|依据|支持|有关|通常|一种以|表现为|由于|因此|所以|通过|进行|需要|可以|应当|必须|降低|升高|增加|减少|导致|用于|作为|时|和|与|或)')
+BAD_PHRASE_RE = re.compile(r'(包括|原则|依据|支持|有关|通常|一种以|表现为|由于|因此|所以|通过|进行|需要|可以|应当|必须|降低|升高|增加|减少|导致|用于|作为|重点|时|和|与|或)')
 MARKER_RE = re.compile(r'^(老师说|老师强调|存疑|不会|待确认|必考|考过|易错|重点|注意)$')
 
 
@@ -89,10 +90,10 @@ def main():
         if chapter and not (row_chunks & chapter_chunk_ids or chapter in json.dumps(row.get('chapters', {}), ensure_ascii=False).lower()):
             continue
         score = row.get('count', 0)
-        roles = row.get('source_roles') or {}
-        score += 3 * int('teacher/textbook' in roles)
-        score += 2 * int('user_notes' in roles)
-        score += 2 * int('historical_questions' in roles)
+        roles = normalize_role_counts(row.get('source_roles') or {})
+        score += 3 * int(bool({'teacher_ppt', 'textbook', 'official_handout', 'syllabus'} & set(roles)))
+        score += 2 * int('user_note' in roles)
+        score += 2 * int(bool(QUESTION_SOURCE_ROLES & set(roles)))
         if re.search(r'[A-Za-z/]', term):
             score += 2
         scores[term] += score

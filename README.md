@@ -8,7 +8,7 @@ English version: [README.en.md](README.en.md)
 
 ## 安装
 
-安装前置 skills，然后安装本 skill。
+先安装文档 skills，再安装本 skill 和环境。
 
 ### 1. 安装 Claude 官方文档 skills
 
@@ -26,32 +26,16 @@ English version: [README.en.md](README.en.md)
 /plugin install document-skills@anthropic-agent-skills
 ```
 
-### 2. 安装推荐辅助 skills
+### 2. 安装笔记整理与环境
 
-完整体验需要 `humanizer` 和 `markdown-mermaid-writing`：
-
-- `humanizer`：用于在内容正确后做文字润色，让最终笔记读起来更自然。
-- `markdown-mermaid-writing`：用于知识关系图、章节结构图和复习路线图。没有它也能整理笔记，但完整形态需要它。
-
-本仓库提供了安装脚本：
-
-```bash
-bash tools/install-recommended-skills.sh
-```
-
-脚本会安装：
-
-- `humanizer`：<https://github.com/blader/humanizer>
-- `markdown-mermaid-writing`：来自 <https://github.com/K-Dense-AI/scientific-agent-skills>
-
-如需手动安装，可参考脚本内容。
-
-### 3. 安装笔记整理
+还需安装附加 skills：`humanizer`、`markdown-mermaid-writing`。下面的脚本会一起安装。
 
 把本仓库放入 Claude 的 skills 目录：
 
 ```bash
 git clone https://github.com/Renakoni/note-organizer.git ~/.claude/skills/note-organizer
+cd ~/.claude/skills/note-organizer
+bash tools/install-environment.sh
 ```
 
 也可以手动复制目录，最终结构应类似：
@@ -60,8 +44,10 @@ git clone https://github.com/Renakoni/note-organizer.git ~/.claude/skills/note-o
 ~/.claude/skills/note-organizer/
 ├─ SKILL.md
 ├─ README.md
+├─ requirements.txt
 ├─ references/
-└─ scripts/
+├─ scripts/
+└─ tools/
 ```
 
 安装完成后，重启 Claude Code 或开启一个新会话。
@@ -86,6 +72,13 @@ git clone https://github.com/Renakoni/note-organizer.git ~/.claude/skills/note-o
 
 Claude 会先扫描资料、识别已有题目、推断章节和资料角色，然后给出一次结构确认。确认后，它会继续分批生成笔记。
 
+如果已经有整理过的笔记库，也可以让它继续维护：
+
+```text
+/note-organizer
+这是上次整理到一半的课程笔记库，请先检查进度和资料缺口，然后继续整理。
+```
+
 ## 项目简介
 
 笔记整理是一个 Claude Skill，用来处理那种“资料都有，但不知道从哪里开始看”的学习场景。老师课件、教材摘录、PDF、Word 文档、PPT、个人课堂笔记、学长学姐资料、课后习题、历年试题和题库，都可以一起交给它整理。
@@ -97,11 +90,12 @@ Claude 会先扫描资料、识别已有题目、推断章节和资料角色，�
 ## 推荐工作流
 
 1. 把资料放进同一个文件夹。
-2. 尽量保留有意义的文件名，例如 `teacher_ppt`、`user_notes`、`past_exam`、`question_bank`。
+2. 尽量保留有意义的文件名，例如 `teacher_ppt`、`user_note`、`historical_exam`、`source_question`。
 3. 让 Claude 先扫描资料、提取已有题目、推断章节，并规划输出结构。
 4. 检查章节结构和资料角色有没有明显错误。
 5. 让 Claude 分批生成章节笔记、题目解析和补强记录。
-6. 最后查看 `00_资料缺口与待确认.md` 和 `00_题目覆盖与笔记补强.md`。
+6. 新增资料时，让 Claude 先更新 `.course_index/`，再只改受影响的章节和全局文件。
+7. 最后查看 `00_资料缺口与待确认.md` 和 `00_题目覆盖与笔记补强.md`，并做一次笔记库一致性检查。
 
 ## 适合哪些场景
 
@@ -111,11 +105,22 @@ Claude 会先扫描资料、识别已有题目、推断章节和资料角色，�
 - 用题库、课后习题或历年题反查知识点覆盖情况
 - 整理较长课程，并且希望能分批推进、断点续跑
 - 把已有 Markdown 或 Obsidian 笔记补成完整的复习系统
+- 给已有笔记库追加新课件、新题目或课堂补充，并检查受影响章节
 - 为文学、历史、法学、医学、工科、计算机等不同学科建立合适的笔记结构
 
 ## 它会生成什么
 
-一次完整整理通常会生成这些文件：
+一次完整整理通常会生成一个清晰分层的输出目录：
+
+```text
+课程整理输出/
+├─ 期末复习/        # 最终 Markdown/Obsidian 笔记库
+├─ _extracted/      # 提取文本和 OCR sidecar
+├─ .course_index/   # 索引、进度和检查状态
+└─ _working/        # 临时章节包和脚本中间输出
+```
+
+`期末复习/` 里通常包含：
 
 - `00_总目录.md`
 - `00_项目状态.md`
@@ -132,7 +137,6 @@ Claude 会先扫描资料、识别已有题目、推断章节和资料角色，�
 - `00_自建题库.md`
 - 每章的章节总览、核心概念、知识框架、易混淆点、典型考法和自测题
 - 稳定概念的 Obsidian `[[双链]]`
-- `.course_index/` 本地索引文件
 
 实际文件会根据资料情况调整。没有已有题目时，不会强行生成来源题解析；使用外部资料时，会额外生成或更新外部资料标记。
 
@@ -156,7 +160,32 @@ Skill 会在第一轮扫描里提取已有题目，包括课后习题、复习�
 
 ### 本地轻量索引
 
-对于整门课程或资料文件夹，Skill 会建立 `.course_index/` 本地索引，用来记录文件、章节、题目、术语和处理进度。默认使用可审计的本地检索和章节包，不强制搭建复杂 RAG 系统。
+对于整门课程或资料文件夹，Skill 会建立 `.course_index/` 课程索引，用来记录文件、章节、题目、术语和处理进度。索引支持 manifest 增量检测、无变化快速返回、`--status` 状态解释和 `health.json` 健康提示。默认使用可审计的关键词/正则检索和章节包。
+
+可以直接检查索引状态：
+
+```bash
+python scripts/index_status.py path/to/课程整理输出/.course_index --input-dir path/to/课程整理输出/_extracted
+```
+
+### PDF 与 OCR 预检
+
+重要 PDF 如果被报告为“加密”“空文本”或“无法读取”，Skill 会先做提取质量判断，不会只凭一次解析失败就放弃。`pdf_probe.py` 会检查文本层、页级文本密度和不同解析器的加密信号：
+
+```bash
+python scripts/pdf_probe.py path/to/material
+python scripts/pdf_probe.py path/to/file.pdf --pages 20
+```
+
+扫描版或图片型 PDF 应先生成 OCR 文本 sidecar，再进入 `.course_index/`。公式、图表、流程图和截图会保留 `提取存疑` 或 `待核验` 标记，避免 OCR 碎片被写成确定知识点。
+
+### 笔记库一致性检查
+
+整理完成或追加资料后，可以检查全局文件、双链、占位符、来源题覆盖和索引健康状态：
+
+```bash
+python scripts/validate_vault.py path/to/课程整理输出/期末复习 --index-dir path/to/课程整理输出/.course_index
+```
 
 ### 外部资料有边界
 
@@ -164,8 +193,10 @@ Skill 会在第一轮扫描里提取已有题目，包括课后习题、复习�
 
 ## 注意事项
 
-- 扫描版 PDF、公式截图或排版复杂的 PPT 可能提取不完整，需要回看原文件。
+- 扫描版 PDF、图片型 PDF、公式截图或排版复杂的 PPT 可能提取不完整。重要文件应先运行 `pdf_probe.py` 或生成 OCR sidecar，再进入正式整理。
+- 有些 PDF 工具会把带权限标记、空用户密码、损坏对象或不兼容结构的 PDF 误报为加密；不要只凭一次报错判断资料不可读。
 - `coverage_check.py` 是保守的本地支持度检查，不是最终判卷器。
+- `index_status.py` 和 `validate_vault.py` 是一致性检查工具；有警告时应修正明确问题，或在最终报告里说明哪些检查被延后。
 - 外部资料只用于补充理解，考试表述仍应以本地课程资料为准。
 - 大量写入 Markdown 文件时，建议在前台运行 Claude，以便及时批准文件写入。
 
@@ -184,7 +215,7 @@ Skill 会在第一轮扫描里提取已有题目，包括课后习题、复习�
 - 只想简单问一个 PDF 里的事实
 - 完全自动替代人工核对公式、图表和扫描件
 - 把外部搜索结果当作课程唯一依据
-- 需要完整语义向量数据库或复杂 RAG 平台的研究知识库
+- 需要完整研究知识库平台
 
 ## 许可证与依赖说明
 

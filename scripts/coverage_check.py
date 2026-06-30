@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import argparse, json, re
 from pathlib import Path
+from source_roles import AUTHORITY_SOURCE_ROLES, SECONDARY_SOURCE_ROLES, normalize_source_role
 
-TERM_RE = re.compile(r'[A-Za-z][A-Za-z0-9_-]{2,}|[一-鿿]{2,12}')
+TERM_RE = re.compile(r'[A-Za-z][A-Za-z0-9_-]{1,}(?:模型|技术|方法|系统|算法|平台|流程|标准|协议|函数|定理|理论|结构|机制|规则|公式|概念|指标|工具|框架)|[A-Za-z][A-Za-z0-9_-]{2,}|[一-鿿]{2,12}')
 
 
 def read_jsonl(path: Path):
@@ -43,12 +44,12 @@ def support_for(terms, chunks):
 def classify(item, hits):
     if not hits:
         return 'D'
-    roles = {h.get('source_role') for h in hits}
-    if 'teacher/textbook' in roles or 'user_notes' in roles:
+    roles = {normalize_source_role(h.get('source_role')) for h in hits}
+    if roles & AUTHORITY_SOURCE_ROLES:
         if hits[0]['count'] >= max(2, min(4, len(item['terms']) // 2)):
             return 'A'
         return 'B'
-    if 'senior_notes' in roles or 'other' in roles:
+    if roles & SECONDARY_SOURCE_ROLES:
         return 'C'
     return 'B'
 
