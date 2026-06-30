@@ -2,6 +2,8 @@
 
 _Exam in three days, slides unread, PDFs untouched, notes scattered like a crime scene? Give it the materials folder. It will sort the chapters, questions, and priorities, then turn the mess into a Markdown note library you can actually study from._
 
+Currently, this skill supports Claude Code only.
+
 ---
 
 ## Installation

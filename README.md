@@ -4,6 +4,8 @@ _三天后考试，课件还没看，PDF 还没翻，笔记散得像案发现场
 
 English version: [README.en.md](README.en.md)
 
+当前仅支持在 Claude Code 中安装和使用。
+
 ---
 
 ## 安装
